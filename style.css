@@ -3,8 +3,6 @@ body {
     justify-content: center;
     align-items: center;
     height: 100vh;
-    /* background-color: #f7f7f7; */
-    
     overflow: hidden;
     font-family: Arial, sans-serif;
 }
@@ -46,5 +44,24 @@ body {
     background-image: url('cactus.png'); /* Use your own cactus image */
     background-size: contain;
     background-repeat: no-repeat;
-    right: -20px; /* start outside the screen */
+    right: -20px;
+}
+
+.score-card {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    display: flex;
+    flex-direction: column;
+    color: #333;
+}
+
+.restart-game {
+    display: none;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 20px;
+    color: red;
 }

@@ -1,15 +1,27 @@
 const dino = document.querySelector('.dino');
 const cactus = document.querySelector('.cactus');
+const scoreElement = document.getElementById('score');
+const highScoreElement = document.getElementById('high-score');
+const restartGameElement = document.querySelector('.restart-game');
+
 let isJumping = false;
 let gravity = 0.9;
+let score = 0;
+let highScore = localStorage.getItem('highScore') || 0;
+let isGameOver = false;
+let cactusInterval, scoreInterval;
 
-function handleKeyUp(event) {
-    if (event.keyCode === 32) { // Space key
-        if (!isJumping) {
-            jump();
-        }
+highScoreElement.innerText = highScore;
+
+// Handle key press for jump
+document.addEventListener('keydown', event => {
+    if (event.keyCode === 32 && !isJumping && !isGameOver) {  // Space key
+        jump();
     }
-}
+    if (event.key === 'r' && isGameOver) {  // Restart game
+        restart();
+    }
+});
 
 function jump() {
     let position = 0;
@@ -41,27 +53,61 @@ function jump() {
 function createCactus() {
     let cactusPosition = 1000;
     let randomTime = Math.random() * 6000;
-
+    
     cactus.style.left = cactusPosition + 'px';
-
-    let moveCactus = setInterval(() => {
-        cactusPosition -= 10;
+    
+    cactusInterval = setInterval(() => {
+        cactusPosition -= 5;
         cactus.style.left = cactusPosition + 'px';
-
-        if (cactusPosition < -60) {
-            clearInterval(moveCactus);
-            cactus.style.left = '1000px';
+        
+        // Check for collision
+        if (cactusPosition > 0 && cactusPosition < 60 && parseInt(dino.style.bottom) === 0) {
+            clearInterval(cactusInterval);
+            clearInterval(scoreInterval);
+            isGameOver = true;
+            restartGameElement.style.display = 'block';
+            checkHighScore();
+            alert('Game Over!');
         }
-
-        if (cactusPosition > 0 && cactusPosition < 60 && dino.style.bottom === '0px') {
-            clearInterval(moveCactus);
-            alert("Game Over!");
-            document.location.reload();
+        
+        if (cactusPosition < -60) {
+            clearInterval(cactusInterval);
+            cactus.style.left = '1000px';
         }
     }, 20);
 
-    setTimeout(createCactus, randomTime);
+    if (!isGameOver) {
+        setTimeout(createCactus, randomTime);
+    }
 }
 
-createCactus();
-document.addEventListener('keyup', handleKeyUp);
+function startScoring() {
+    scoreInterval = setInterval(() => {
+        score++;
+        scoreElement.innerText = score;
+    }, 100);
+}
+
+function checkHighScore() {
+    if (score > highScore) {
+        highScore = score;
+        highScoreElement.innerText = highScore;
+        localStorage.setItem('highScore', highScore);
+    }
+}
+
+function restart() {
+    score = 0;
+    scoreElement.innerText = score;
+    isGameOver = false;
+    restartGameElement.style.display = 'none';
+    startScoring();
+    createCactus();
+}
+
+function main() {
+    startScoring();
+    createCactus();
+}
+
+main();
